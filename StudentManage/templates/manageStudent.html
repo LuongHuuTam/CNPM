@@ -1,0 +1,84 @@
+{% extends "manage.html" %}
+
+{% block title %}
+Quản lí học sinh
+{% endblock %}
+
+
+{% block body %}
+<form class="input-group mt-3 mb-2">
+    <input type="text" class="form-control border-1 small color-light" name="search" id="search"
+           placeholder="Tìm học sinh . . .">
+    <div class="input-group-append">
+        <button class="btn btn-success" type="submit">
+            <i class="fas fa-search fa-sm"></i>
+        </button>
+    </div>
+
+</form>
+<div class="">
+    <div class="text-center">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+        <p style="color:skyblue">{{ msg }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <table class="table table-striped table-bordered table-hover"
+           style="border:2px; background-color:white;text-align:center;">
+        <thead>
+        <tr style="color:black; background-color:skyblue">
+            <th>Họ</th>
+            <th>Tên</th>
+            <th>Giới tính</th>
+            <th>Ngày sinh</th>
+            <th>Địa chỉ</th>
+            <th>Email</th>
+            <th>Lớp</th>
+            <th>#</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stu in student%}
+        <tr>
+            <td>{{stu.firstname}}</td>
+            <td>{{stu.lastname}}</td>
+            {% if stu.male == 'Male' %}
+            <td>Nam</td>
+            {% else %}
+            <td>Nữ</td>
+            {% endif %}
+            <td>{{stu.birthday}}</td>
+            <td>{{stu.address}}</td>
+            <td>{{stu.email}}</td>
+            <td>{{stu.class}}</td>
+            <td>
+                <a href="/manage/student/edit{{stu.id}}" class="delete">Sửa</a>
+                |
+                <a href="#" data-toggle="modal" data-target="#deleteUser" data-user="@item.Username"
+                   class="delete">Xóa</a>
+            </td>
+        </tr>
+        {% endfor%}
+        </tbody>
+    </table>
+</div>
+<div class="m-auto">
+    <a href="/manage/student/add" class="btn btn-success float-right">Tiếp nhận học sinh</a>
+</div>
+{% endblock %}
+
+
+{% block jsFooter %}
+<script>
+$(".nav-item:nth-child({{ac}})").toggleClass('active');
+var search='{{search}}';
+if (search!='None'){
+    $('#search').val(search);
+
+}
+
+</script>
+{% endblock %}

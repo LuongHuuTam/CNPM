@@ -1,0 +1,42 @@
+{% extends "manage.html" %}
+
+{% block title %}
+Quản lí giáo viên
+{% endblock %}
+
+
+{% block body %}
+<table class="table table-striped table-bordered table-hover"
+       style="border:2px; background-color:white;text-align:center;">
+    <thead>
+    <tr style="color:black; background-color:skyblue">
+        <th>Họ</th>
+        <th>Tên</th>
+        <th>Giáo viên môn</th>
+        <th>Các lớp giảng dạy</th>
+        <th>#</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for t in teacher %}
+    <tr>
+        <td>{{t.firstname}}</td>
+        <td>{{t.lastname}}</td>
+        <td>{{t.sub}}</td>
+        <td>{{t.classes}}</td>
+        <td>
+            <a href="/manage/teacher/edit{{t.id}}" class="delete">Sửa</a>
+        </td>
+    </tr>
+    {% endfor%}
+    </tbody>
+</table>
+{% endblock %}
+
+
+{% block jsFooter %}
+<script>
+$(".nav-item:nth-child({{ac}})").toggleClass('active');
+
+</script>
+{% endblock %}

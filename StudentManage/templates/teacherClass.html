@@ -1,0 +1,54 @@
+{% extends "teacher.html" %}
+{% block body %}
+<div class="mt-2">
+    <div class="d-flex justify-content-between">
+        <form id="submit" class="col-sm-">
+            <div class="d-flex justify-content-between align-items-end">
+            <label for="semester" class="" style="flex:none!important;max-width:100%!important">Học kì</label>
+            <select name="semester" id="semester" onchange="this.form.submit()" class="custom-select ml-2">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+                </div>
+        </form>
+        <h3>Môn học: {{sub}}</h3>
+    </div>
+    <table class="table table-striped table-bordered table-hover"
+           style="border:2px; background-color:white;text-align:center;">
+        <thead>
+        <tr style="color:black; background-color:skyblue">
+            <th>Họ</th>
+            <th>Tên</th>
+            <th>Ngày sinh</th>
+            <th>Điểm 15 phút</th>
+            <th>Điểm 1 tiết</th>
+            <th>Điểm cuối kì</th>
+            <th>Điểm trung bình</th>
+            <th>#</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for s in scores%}
+        <tr>
+            <td>{{s.firstname}}</td>
+            <td>{{s.lastname}}</td>
+            <td>{{s.birthday}}</td>
+            <td>{{s.scores_15}}</td>
+            <td>{{s.scores_1h}}</td>
+            <td>{{s.scores_final}}</td>
+            <td>{{s.avg_scores}}</td>
+            <td>
+                <a href="/teacher/scores/{{s.id}}ki{{semester}}" class="delete">Thêm/Sửa</a>
+            </td>
+        </tr>
+        {% endfor%}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block jsFooter %}
+<script>
+$("#{{ac}}").toggleClass('active');
+$('#semester').val({{semester}});
+</script>
+{% endblock %}

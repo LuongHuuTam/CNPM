@@ -1,0 +1,103 @@
+{% extends "manage.html" %}
+
+{% block title %}
+Quản lí lớp học
+{% endblock %}
+
+{% block body %}
+<div id="wrapper">
+    <ul class="navbar-nav sidebar sidebar-light accordion p-2" id="accordionSidebar" style="  background: linear-gradient(to bottom, #e0eafc, #cfdef3)">
+        <div class="sidebar-heading">
+            Khối 10
+        </div>
+        {% for c in cl %}
+        {% if c.grade=='10' %}
+        <li class="nav-item {{c.id}}">
+            <a class="nav-link" href="/manage/class/{{c.id}}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>{{c}}</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">
+            Khối 11
+        </div>
+        {% for c in cl %}
+        {% if c.grade=='11' %}
+        <li class="nav-item {{c.id}}">
+            <a class="nav-link" href="/manage/class/{{c.id}}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>{{c}}</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">
+            Khối 12
+        </div>
+        {% for c in cl %}
+        {% if c.grade=='12' %}
+        <li class="nav-item {{c.id}}">
+            <a class="nav-link" href="/manage/class/{{c.id}}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>{{c}}</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+    </ul>
+    <div id="content-wrapper" class="p-3 d-flex flex-column">
+        <h3 class="text-center">Năm học: {{course}}</h3>
+        <div class="d-flex justify-content-between">
+            <h5>Lớp: <span id="lop"></span> </h5>
+            <h5>Sỉ số: <span id="SiSo">{{count}}</span></h5>
+        </div>
+        <table class="table table-striped table-bordered table-hover"
+           style="border:2px; background-color:white;text-align:center;">
+        <thead>
+        <tr style="color:black;">
+            <th>STT</th>
+            <th>Họ và Tên</th>
+            <th>Giới tính</th>
+            <th>Ngày sinh</th>
+            <th>Địa chỉ</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stu in student %}
+        <tr>
+            <td class="stt"></td>
+            <td>{{stu}}</td>
+            {% if stu.male == 'Male' %}
+            <td>Nam</td>
+            {% else %}
+            <td>Nữ</td>
+            {% endif %}
+            <td>{{stu.birthday}}</td>
+            <td>{{stu.address}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block jsFooter %}
+<script>
+$(".nav-item:nth-child({{ac}})").toggleClass('active');
+$(".sidebar .nav-item:nth-child({{ac}})").toggleClass('active');
+$(".{{i}}").toggleClass('active');
+var x =$(".{{i}}.active").text();
+$('#lop').text(x);
+var index = 1;
+$('.stt').each(function () {
+    this.innerHTML = index;
+    index++;
+})
+</script>
+{% endblock %}

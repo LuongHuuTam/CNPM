@@ -1,0 +1,50 @@
+{% extends "admin/master.html" %}
+
+{% block body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<canvas id="myChart" width="400" height="400" class="m-3" style="max-height=600px"></canvas>
+<script>
+$(function() {
+    $.ajax({
+        url: '/statistic-admin',
+        type: 'GET',
+        success: function(response) {
+            var dataa=JSON.parse(response);
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataa.labels,
+                datasets: [{
+                    label: '# of Rate',
+                    data: dataa.data,
+                    borderColor: 'black',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title:{
+                    display: true,
+                    text: 'Passing rate',
+                    fontSize:40
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: 80,
+                        }
+                    }]
+                }
+
+            }
+        });
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+});
+
+</script>
+{% endblock %}

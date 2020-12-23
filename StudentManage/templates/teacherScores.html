@@ -1,0 +1,62 @@
+{% extends "teacher.html" %}
+
+{% block body %}
+<h2 style="text-align:center; margin-top:3rem; font-family:cursive; color:darkred">Nhập điểm học sinh</h2>
+
+<div class="mt-2 p-3 border border-info rounded container bg-light">
+    <div class="mt-2">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+        <p style="color:blue">{{ msg }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="text-danger text-center"><p>Nếu có nhiều cột điểm cùng loại thì viết cách nhau bởi khoảng trắng</p></div>
+    <form action="/teacher/scores/{{scores.id}}ki{{semester}}" method="post">
+        <div class="form-group row">
+            <label for="staticFirstName" class="col-sm-2 col-form-label text-right">Họ và tên</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="staticFirstName" name="firstname"
+                       value="{{scores.firstname}} {{scores.lastname}}" disabled>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticBirthday" class="col-sm-2 col-form-label text-right">Ngày sinh</label>
+            <div class="col-sm-10">
+                <input type="date" class="form-control" id="staticBirthday" name="birthday"
+                       value="{{scores.birthday}}" disabled>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="static15" class="col-sm-2 col-form-label text-right">Điểm 15 phút</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="static15" name="scores_15" value="{{scores.scores_15}}">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticEmail" class="col-sm-2 col-form-label text-right">Điểm 1 tiết</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="staticEmail" name="scores_1h" value="{{scores.scores_1h}}">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticEmail" class="col-sm-2 col-form-label text-right">Điểm cuối kì</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="" name="scores_final" value="{{scores.scores_final}}">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary m-2">Lưu thay đổi</button>
+            <a href="/teacher/class{{ac}}" class="btn btn-danger m-2">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block jsFooter %}
+<script>
+$("#{{ac}}").toggleClass('active');
+</script>
+{% endblock %}

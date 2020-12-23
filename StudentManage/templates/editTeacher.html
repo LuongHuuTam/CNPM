@@ -1,0 +1,45 @@
+{% extends 'manageTeacher.html' %}
+
+
+{% block body %}
+<h2 style="text-align:center; margin-top:3rem; font-family:cursive; color:darkred">Thay đổi các lớp giảng dạy</h2>
+
+<div class="mt-2 p-3 border border-info rounded container bg-light">
+    <div class="mt-2">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+        <p style="color:blue">{{ msg }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <form action="/manage/teacher/edit{{id}}" method="post">
+        {% for c in cl %}
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <input type="checkbox" id="{{c.id}}" name="class" value="{{c.id}}">
+                </div>
+            </div>
+             <input type="text" class="form-control" value="{{c}}" disabled>
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary m-2">Lưu thay đổi</button>
+            <a href="/manage/teacher" class="btn btn-danger m-2">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block jsFooter %}
+<script>
+$(".nav-item:nth-child({{ac}})").toggleClass('active');
+{% for n in teach %}
+document.getElementById("{{n.id}}").checked = true;
+{% endfor %}
+
+</script>
+{% endblock %}

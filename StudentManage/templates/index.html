@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block header %}
+<form class="input-group mt-3">
+    <input type="text" class="form-control bg-light border-0 small" name="search" placeholder="Nhập họ tên để xem điểm"
+           aria-label="Search" aria-describedby="basic-addon2">
+    <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">
+            <i class="fas fa-search fa-sm"></i>
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block body %}
+{% if res != None %}
+{% for i in res %}
+<div class="m-2">
+    <a href="/view-scores/{{i.id}}">{{i}}</a>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block jsFooter %}
+<script>
+{%if search != None %}
+$('input').val('{{search}}');
+{% endif %}
+
+</script>
+{% endblock %}

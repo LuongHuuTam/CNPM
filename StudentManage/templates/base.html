@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet"
+          type="text/css">
+    <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <title>{% block title%}{% endblock %}</title>
+</head>
+<body style="padding:0 10%" id="page-top">
+<div class="d-flex align-middle">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="" style="width: 150px;height: 150px;">
+    <div class="p-3">
+        <h2 class="text-info">TRƯỜNG TRUNG HỌC PHỔ THÔNG MAI SƠN</h2>
+        <hr>
+        <h4>Học-Học nữa-Học mãi</h4>
+    </div>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('logout') }}" style="position:relative; top: 1rem; right: -13%; text-decoration:none;"><h4>
+        Logout</h4></a>
+    {% else %}
+    <a href="{{ url_for('login') }}" style="position:relative; top: 1rem; right: -13%; text-decoration:none"><h4>
+        Login</h4></a>
+    {% endif %}
+</div>
+{% block header %}
+{% endblock %}
+{% block body %}
+{% endblock %}
+<footer class="sticky-footer bg-white">
+    <div class="container my-auto">
+        <div class="copyright text-center my-auto" style="position:absolute; bottom: 1rem; left:45%">
+            <span>Công nghệ phần mềm - Nhóm 17</span>
+        </div>
+    </div>
+</footer>
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+</body>
+</html>
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+{% block jsFooter %}
+{% endblock %}
