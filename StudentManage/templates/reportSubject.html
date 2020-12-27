@@ -1,15 +1,23 @@
 {% extends "manage.html" %}
 
 {% block title %}
-Thống kê học kì
+Thống kê môn học
 {% endblock %}
 
 {% block body %}
 
 <form id="submit" class="">
     <div class="form-group row mt-2">
-        <div class="col-sm-9">
-            <h2 class="text-center">Thống kê học kì</h2>
+        <div class="col-sm-6">
+            <h2 class="text-center">Thống kê môn học</h2>
+        </div>
+        <div class="d-flex justify-content-between align-items-end col-sm-3">
+            <label for="semester" class="" style="flex:none!important;max-width:100%!important">Môn</label>
+            <select name="subject" id="subject" onchange="this.form.submit()" class="custom-select ml-2">
+                {% for s in sub %}
+                <option value="{{s.id}}">{{s}}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="d-flex justify-content-between align-items-end col-sm-3">
             <label for="semester" class="" style="flex:none!important;max-width:100%!important">Học kì</label>
@@ -64,23 +72,26 @@ $('.stt').each(function () {
     this.innerHTML = index;
     index++;
 });
+$('#subject').val('{{subject}}');
 $('#semester').val('{{semester}}');
 
 $(function(){
+    var subject = $('#subject').val();
     var semester = $('#semester').val();
     $.ajax({
-        url: '/drawReportSemester',
-        data: { semester:semester },
+        url: '/drawReportSubject',
+        data: { subject:subject, semester:semester },
         type: 'GET',
         success: function(response){
             var dataa=JSON.parse(response);
             var ctx = document.getElementById('myChart').getContext('2d');
+            ctx.height= 400;
             var myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: dataa.labels,
                     datasets: [{
-                        label: 'Tỉ lệ đạt học kì ' + $('#semester option:selected').text(),
+                        label: 'Tỉ lệ qua môn ' + $('#subject option:selected').text(),
                         data: dataa.data,
                         backgroundColor: "#91ffb5",
                         hoverBackgroundColor: "#a3edf0",

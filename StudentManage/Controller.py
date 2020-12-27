@@ -33,6 +33,14 @@ class InfoTeacher:
         self.classes = classes
 
 
+class ReportSubject:
+    def __init__(self, cl, amount, countpass, rate):
+        self.cl = cl
+        self.amount = amount
+        self.countpass = countpass
+        self.rate = rate
+
+
 def get_user_byID(id):
     return Account.query.filter(Account.id == id).first()
 
@@ -46,7 +54,7 @@ def get_teacher():
 
 
 def get_all_student():
-    return Student.query.order_by(Student.class_id).all()
+    return Student.query.order_by(Student.class_id, Student.lastname).all()
 
 
 def Age(birthday):
@@ -159,23 +167,85 @@ def get_all_scores(stu_id, semester):
     sub = Subject.query.all()
     res = []
     for s in sub:
-        scores = Scores.query.filter(Scores.subject_id == s.id, Scores.student_id == stu_id,
-                                     Scores.semester == semester).all()
-        subject = s.name
-        scores_15 = ''
-        scores_1h = ''
-        scores_final = ''
-        scores_avg = ''
-        for i in scores:
-            if i.test_id == 1:
-                scores_15 += str(i.scores) + ' '
-            if i.test_id == 2:
-                scores_1h += str(i.scores) + ' '
-            if i.test_id == 3:
-                scores_final += str(i.scores) + ' '
-            if i.test_id == 4:
-                scores_avg += str(i.scores) + ' '
-        temp = AllScoresStudent(student.fullname, subject, scores_15.strip(), scores_1h.strip(), scores_final.strip(),
-                                scores_avg.strip())
+        temp = get_scores_detail_in_subject(s.id, stu_id, semester)
         res.append(temp)
+    return res
+
+
+def get_scores_detail_in_subject(sub_id, stu_id, semester):
+    s = Subject.query.filter(Subject.id == sub_id).first()
+    student = get_student_byid(stu_id)
+    scores = Scores.query.filter(Scores.subject_id == s.id, Scores.student_id == stu_id,
+                                 Scores.semester == semester).all()
+    subject = s.name
+    scores_15 = ''
+    scores_1h = ''
+    scores_final = ''
+    scores_avg = ''
+    for i in scores:
+        if i.test_id == 1:
+            scores_15 += str(i.scores) + ' '
+        if i.test_id == 2:
+            scores_1h += str(i.scores) + ' '
+        if i.test_id == 3:
+            scores_final += str(i.scores) + ' '
+        if i.test_id == 4:
+            scores_avg += str(i.scores) + ' '
+    return AllScoresStudent(student.fullname, subject, scores_15.strip(), scores_1h.strip(), scores_final.strip(),
+                            scores_avg.strip())
+
+
+def get_avg_full_course(stu_id):
+    return round((get_avg_semester(stu_id,1) + get_avg_semester(stu_id,2)) / 2, 1)
+
+
+def get_avg_semester(stu_id, semester):
+    res = get_all_scores(stu_id, semester)
+    avg = 0
+    for i in res:
+        temp = 0
+        if i.avg_scores != '':
+            temp = float(i.avg_scores)
+        avg += temp
+    avg = round(avg / len(res), 1)
+    return avg
+
+
+def report_subject(sub_id, semester):
+    cl = Class.query.all()
+    res = []
+    for c in cl:
+        stu = get_student_in_class(c.id)
+        amount = len(stu)
+        tempamount = 1
+        if amount!=0:
+            tempamount=amount
+        countpass = 0
+        for s in stu:
+            temp = get_scores_detail_in_subject(sub_id, s.id, semester)
+            if temp.avg_scores == '':
+                temp.avg_scores = 0
+            if float(temp.avg_scores) >= 5:
+                countpass += 1
+        resp = ReportSubject(c, amount, countpass, round((countpass / tempamount) * 100, 2))
+        res.append(resp)
+    return res
+
+
+def report_semester(semester):
+    cl = Class.query.all()
+    res = []
+    for c in cl:
+        stu = get_student_in_class(c.id)
+        amount = len(stu)
+        tempamount = 1
+        if amount != 0:
+            tempamount = amount
+        countpass = 0
+        for s in stu:
+            temp = get_avg_semester(s.id,semester)
+            if temp >= 5:
+                countpass += 1
+        resp = ReportSubject(c, amount, countpass, round((countpass / tempamount) * 100, 2))
+        res.append(resp)
     return res

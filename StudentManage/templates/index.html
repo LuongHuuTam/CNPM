@@ -5,7 +5,7 @@ Home
 {% endblock %}
 
 {% block header %}
-<form class="input-group mt-3">
+<form action="/" method="get" class="input-group mt-3">
     <input type="text" class="form-control bg-light border-0 small" name="search" placeholder="Nhập họ tên để xem điểm"
            aria-label="Search" aria-describedby="basic-addon2">
     <div class="input-group-append">
@@ -20,7 +20,7 @@ Home
 {% if res != None %}
 {% for i in res %}
 <div class="m-2">
-    <a href="/view-scores/{{i.id}}">{{i}}</a>
+    <a href="/view-scores/{{i.id}}">{{i}}-{{i.class}}</a>
 </div>
 {% endfor %}
 {% endif %}

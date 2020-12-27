@@ -29,7 +29,16 @@ def viewscores(id):
     if semester == None:
         semester = 1
     res = get_all_scores(id, semester)
-    return render_template('viewscores.html', res=res, semester=semester)
+    avg = 0
+    avg_all = 0
+    if semester == '2':
+        avg = get_avg_semester(id, 2)
+        avg_all = get_avg_full_course(id)
+
+    else:
+        avg = get_avg_semester(id, 1)
+
+    return render_template('viewscores.html', res=res, semester=semester, avg=avg, avg_all=avg_all)
 
 
 @login.user_loader
@@ -282,12 +291,65 @@ def manageclassID(id):
         return redirect('/login')
 
 
-@app.route('/manage/report')
+@app.route('/drawReportSubject')
+def drawReportSubject():
+    subject = request.args.get('subject')
+    semester = request.args.get('semester')
+    report = report_subject(subject, semester)
+    labels = []
+    data = []
+    for i in report:
+        labels.append(str(i.cl))
+        data.append(i.rate)
+    return json.dumps({'labels': labels, 'data': data})
+
+
+@app.route('/manage/reportsubject')
+def reportsubject():
+    if current_user.is_authenticated:
+        user = get_user_byID(current_user.get_id())
+        if user.admin == 1:
+            sub = Subject.query.all()
+            subject = request.args.get('subject')
+            semester = request.args.get('semester')
+            if subject == None:
+                subject = 1
+            if semester == None:
+                semester = 1
+            report = report_subject(subject, semester)
+            return render_template('reportSubject.html', ac=4, sub=sub, report=report, subject=subject,
+                                   semester=semester)
+        else:
+            flash('Tài khoản của bạn không có quyền truy cập')
+            return redirect('/login')
+
+    else:
+        return redirect('/login')
+
+
+@app.route('/drawReportSemester')
+def drawReportSemester():
+    semester = request.args.get('semester')
+    report = report_semester(semester)
+    labels = []
+    data = []
+    for i in report:
+        labels.append(str(i.cl))
+        data.append(i.rate)
+    return json.dumps({'labels': labels, 'data': data})
+
+
+@app.route('/manage/reportyear')
 def reportyear():
     if current_user.is_authenticated:
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
-            return render_template('reportYear.html', ac=4)
+            sub = Subject.query.all()
+            semester = request.args.get('semester')
+            if semester == None:
+                semester = 1
+            report = report_semester(semester)
+            return render_template('reportYear.html', ac=4, sub=sub, report=report, semester=semester)
         else:
             flash('Tài khoản của bạn không có quyền truy cập')
             return redirect('/login')
@@ -402,96 +464,57 @@ def editoraddscores(stu_id, semester):
                 sum = 0
                 count = 0
                 # Thêm điểm
-                if len(all_scores) == 0:
-                    for x in scores_15:
-                        if x != '':
-                            res = Scores(
-                                student_id=stu_id,
-                                subject_id=user.subject_id,
-                                test_id=1,
-                                scores=float(x),
-                                semester=semester
-                            )
-                            sum += float(x)
-                            count += 1
-                            db.session.add(res)
-                    for x in scores_1h:
-                        if x != '':
-                            res = Scores(
-                                student_id=stu_id,
-                                subject_id=user.subject_id,
-                                test_id=2,
-                                scores=float(x),
-                                semester=semester
-                            )
-                            sum += (float(x) * 2)
-                            count += 2
-                            db.session.add(res)
-                    for x in scores_final:
-                        if x != '':
-                            res = Scores(
-                                student_id=stu_id,
-                                subject_id=user.subject_id,
-                                test_id=3,
-                                scores=float(x),
-                                semester=semester
-                            )
-                            sum += (float(x) * 3)
-                            count += 3
-                            db.session.add(res)
-                    res = Scores(
-                        student_id=stu_id,
-                        subject_id=user.subject_id,
-                        test_id=4,
-                        scores=sum / count,
-                        semester=semester
-                    )
-                    db.session.add(res)
-                    db.session.commit()
-                    return redirect('/teacher/class' + str(student.class_id) + '?semester=' + str(semester))
-
-                # Sửa điểm
-                db_scores15 = get_test15(all_scores)
-                db_scores1h = get_test1h(all_scores)
-                db_scoresfinal = get_testfinal(all_scores)
-                db_avg = get_testavg(all_scores)
-                if len(scores_15) != len(db_scores15) or len(scores_1h) != len(db_scores1h) or len(scores_final) != len(
-                        db_scoresfinal):
-                    flash('Vui lòng nhập kiểm tra lại thông tin')
-                    res = get_scores_student_in_sub(sub_id=user.subject_id, stu_id=student.id, semester=semester)
-                    res.scores_15 = sc_15
-                    res.scores_1h = sc_1h
-                    res.scores_final = sc_final
-                    return render_template('teacherScores.html', cl=cl, scores=res, ac=student.class_id,
-                                           semester=semester)
-                i = 0
-                for x in db_scores15:
+                if len(all_scores) != 0:
+                    for i in all_scores:
+                        db.session.delete(i)
+                db.session.commit()
+                for x in scores_15:
                     if x != '':
-                        x.scores = float(scores_15[i]),
-                        x.date_create = datetime.now()
-                        sum += float(scores_15[i])
+                        res = Scores(
+                            student_id=stu_id,
+                            subject_id=user.subject_id,
+                            test_id=1,
+                            scores=float(x),
+                            semester=semester
+                        )
+                        sum += float(x)
                         count += 1
-                        i += 1
-                i = 0
-                for x in db_scores1h:
+                        db.session.add(res)
+                for x in scores_1h:
                     if x != '':
-                        x.scores = float(scores_1h[i]),
-                        x.date_create = datetime.now()
-                        sum += float(scores_1h[i]) * 2
+                        res = Scores(
+                            student_id=stu_id,
+                            subject_id=user.subject_id,
+                            test_id=2,
+                            scores=float(x),
+                            semester=semester
+                        )
+                        sum += (float(x) * 2)
                         count += 2
-                        i += 1
-                i = 0
-                for x in db_scoresfinal:
+                        db.session.add(res)
+                for x in scores_final:
                     if x != '':
-                        x.scores = float(scores_final[i]),
-                        x.date_create = datetime.now()
-                        sum += float(scores_final[i]) * 3
+                        res = Scores(
+                            student_id=stu_id,
+                            subject_id=user.subject_id,
+                            test_id=3,
+                            scores=float(x),
+                            semester=semester
+                        )
+                        sum += (float(x) * 3)
                         count += 3
-                        i += 1
-                db_avg[0].scores = sum / count
-                db_avg[0].date_create = datetime.now()
+                        db.session.add(res)
+                res = Scores(
+                    student_id=stu_id,
+                    subject_id=user.subject_id,
+                    test_id=4,
+                    scores=round(sum / count, 1),
+                    semester=semester
+                )
+                db.session.add(res)
                 db.session.commit()
                 return redirect('/teacher/class' + str(student.class_id) + '?semester=' + str(semester))
+
         else:
             flash('Tài khoản của bạn không có quyền truy cập')
             return redirect('/login')

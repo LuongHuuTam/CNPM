@@ -4,12 +4,12 @@
     <div class="d-flex justify-content-between">
         <form id="submit" class="col-sm-">
             <div class="d-flex justify-content-between align-items-end">
-            <label for="semester" class="" style="flex:none!important;max-width:100%!important">Học kì</label>
-            <select name="semester" id="semester" onchange="this.form.submit()" class="custom-select ml-2">
-                <option value="1">1</option>
-                <option value="2">2</option>
-            </select>
-                </div>
+                <label for="semester" class="" style="flex:none!important;max-width:100%!important">Học kì</label>
+                <select name="semester" id="semester" onchange="this.form.submit()" class="custom-select ml-2">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
         </form>
         <h3>Môn học: {{sub}}</h3>
     </div>
@@ -50,5 +50,6 @@
 <script>
 $("#{{ac}}").toggleClass('active');
 $('#semester').val({{semester}});
+
 </script>
 {% endblock %}
