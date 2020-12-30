@@ -10,6 +10,7 @@ Quản lí giáo viên
        style="border:2px; background-color:white;text-align:center;">
     <thead>
     <tr style="color:black; background-color:skyblue">
+        <th>Username</th>
         <th>Họ</th>
         <th>Tên</th>
         <th>Giáo viên môn</th>
@@ -20,6 +21,7 @@ Quản lí giáo viên
     <tbody>
     {% for t in teacher %}
     <tr>
+        <td>{{t.username}}</td>
         <td>{{t.firstname}}</td>
         <td>{{t.lastname}}</td>
         <td>{{t.sub}}</td>
@@ -31,6 +33,9 @@ Quản lí giáo viên
     {% endfor%}
     </tbody>
 </table>
+<div class="m-auto">
+    <a href="/manage/teacher/add" class="btn btn-success float-right">Thêm giáo viên</a>
+</div>
 {% endblock %}
 
 

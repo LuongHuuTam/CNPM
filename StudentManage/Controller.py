@@ -25,8 +25,9 @@ class AllScoresStudent:
 
 
 class InfoTeacher:
-    def __init__(self, id, firstname, lastname, subject, classes):
+    def __init__(self, id, username, firstname, lastname, subject, classes):
         self.id = id
+        self.username = username
         self.firstname = firstname
         self.lastname = lastname
         self.sub = subject
@@ -43,6 +44,10 @@ class ReportSubject:
 
 def get_user_byID(id):
     return Account.query.filter(Account.id == id).first()
+
+
+def get_all_class():
+    return Class.query.order_by(Class.grade, Class.name).all()
 
 
 def getuser(username, password):
@@ -72,7 +77,7 @@ def get_student_in_class(id):
 
 
 def get_student(name):
-    return Student.query.filter(Student.fullname.contains(name)).order_by(Student.class_id).all()
+    return Student.query.filter(Student.fullname.contains(name)).order_by(Student.class_id, Student.lastname).all()
 
 
 def get_student_byid(id):
@@ -157,9 +162,9 @@ def get_info_teacher(id):
     cl = get_class_teach(id)
     classes = ''
     for i in cl:
-        x = i.grade + 'A' + i.name
+        x = str(i)
         classes += x + ' '
-    return InfoTeacher(id, acc.firstname, acc.lastname, acc.subject, classes)
+    return InfoTeacher(id, acc.username, acc.firstname, acc.lastname, acc.subject, classes)
 
 
 def get_all_scores(stu_id, semester):
@@ -196,7 +201,7 @@ def get_scores_detail_in_subject(sub_id, stu_id, semester):
 
 
 def get_avg_full_course(stu_id):
-    return round((get_avg_semester(stu_id,1) + get_avg_semester(stu_id,2)) / 2, 1)
+    return round((get_avg_semester(stu_id, 1) + get_avg_semester(stu_id, 2)) / 2, 1)
 
 
 def get_avg_semester(stu_id, semester):
@@ -218,8 +223,8 @@ def report_subject(sub_id, semester):
         stu = get_student_in_class(c.id)
         amount = len(stu)
         tempamount = 1
-        if amount!=0:
-            tempamount=amount
+        if amount != 0:
+            tempamount = amount
         countpass = 0
         for s in stu:
             temp = get_scores_detail_in_subject(sub_id, s.id, semester)
@@ -243,9 +248,32 @@ def report_semester(semester):
             tempamount = amount
         countpass = 0
         for s in stu:
-            temp = get_avg_semester(s.id,semester)
+            temp = get_avg_semester(s.id, semester)
             if temp >= 5:
                 countpass += 1
         resp = ReportSubject(c, amount, countpass, round((countpass / tempamount) * 100, 2))
         res.append(resp)
     return res
+
+
+def check_class(name, list_class):
+    for i in list_class:
+        if i.name == name:
+            return True
+    return False
+
+
+def classes_append():
+    for i in ['10', '11', '12']:
+        c = Class.query.filter(Class.grade == i).order_by(Class.name).all()
+        constraint = Rule.query.filter(Rule.name == 'Class' + i + 'Amount').first()
+        if len(c) != constraint.value:
+            for x in range(1, constraint.value+1):
+                if check_class(str(x),c) == False:
+                    temp = Class(
+                        course=2020,
+                        grade=i,
+                        name=str(x)
+                    )
+                    db.session.add(temp)
+                    db.session.commit()

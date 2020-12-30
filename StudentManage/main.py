@@ -1,6 +1,6 @@
 import hashlib
 
-from flask import request, flash, json
+from flask import request, flash, json, jsonify
 from flask_login import login_user
 
 from StudentManage import app, login
@@ -130,7 +130,7 @@ def addstudent():
     if current_user.is_authenticated:
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
-            cl = Class.query.all()
+            cl = get_all_class()
             if request.method == "GET":
                 return render_template('addStudent.html', ac=1, student=None, cl=cl)
             if request.method == "POST":
@@ -169,7 +169,7 @@ def editStudent(id):
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
             student = Student.query.get(id)
-            cl = Class.query.all()
+            cl = get_all_class()
             if request.method == "GET":
                 return render_template('editStudent.html', ac=1, student=student, cl=cl)
             if request.method == "POST":
@@ -223,7 +223,7 @@ def editClassTeach(id):
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
             if request.method == 'GET':
-                cl = Class.query.all()
+                cl = get_all_class()
                 teach = get_class_teach(id)
                 return render_template('editTeacher.html', ac=2, cl=cl, id=id, teach=teach)
             if request.method == 'POST':
@@ -247,12 +247,45 @@ def editClassTeach(id):
         return redirect('/login')
 
 
+@app.route('/manage/teacher/add', methods=["post", "get"])
+def addteacher():
+    if current_user.is_authenticated:
+        user = get_user_byID(current_user.get_id())
+        if user.admin == 1:
+            sub = Subject.query.all()
+            if request.method == "GET":
+                return render_template('addTeacher.html', ac=2, sub=sub, acc=None)
+            if request.method == "POST":
+                acc = Account(
+                    username=request.form.get('username'),
+                    password=hashlib.md5(request.form.get('password').strip().encode("utf-8")).hexdigest(),
+                    firstname=request.form.get('firstname'),
+                    lastname=request.form.get('lastname'),
+                    admin=0,
+                    active=1,
+                    subject_id=request.form.get('subject')
+                )
+                temp = Account.query.filter(Account.username == acc.username).first()
+                if temp:
+                    flash('Tên đăng nhập đã được sử dụng')
+                    return render_template('addTeacher.html', ac=2, sub=sub, acc=acc)
+                db.session.add(acc)
+                db.session.commit()
+                return redirect('/manage/teacher')
+        else:
+            flash('Tài khoản của bạn không có quyền truy cập')
+            return redirect('/login')
+
+    else:
+        return redirect('/login')
+
+
 @app.route('/manage/class')
 def manageclass():
     if current_user.is_authenticated:
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
-            cl = Class.query.all()
+            cl = get_all_class()
             i = get_class10_first()
             student = Student.query.filter(Student.class_id == i.id).order_by(Student.lastname).all()
             count = len(student)
@@ -273,7 +306,7 @@ def manageclassID(id):
         if user.admin == 1:
             if id == '1':
                 return redirect('/manage/class')
-            cl = Class.query.all()
+            cl = get_all_class()
             if id == '-1':
                 student = get_student_in_class(None)
                 count = len(student)
@@ -394,6 +427,18 @@ def editRule(id):
 
     else:
         return redirect('/login')
+
+@app.route('/changePassword', methods=['post'])
+def changePassword():
+    user = get_user_byID(current_user.get_id())
+    oldpassword = request.form.get('oldpass')
+    if hashlib.md5(oldpassword.strip().encode("utf-8")).hexdigest() != user.password:
+        return jsonify('false')
+    password = request.form.get('newpass')
+    user.password = hashlib.md5(password.strip().encode("utf-8")).hexdigest()
+    db.session.commit()
+    return jsonify('true')
+
 
 
 @app.route('/teacher')
@@ -524,6 +569,7 @@ def editoraddscores(stu_id, semester):
 
 
 if __name__ == '__main__':
+    classes_append()
     from StudentManage.admin_module import *
 
     app.run(debug=True, port=8888)

@@ -20,3 +20,72 @@ Nhập điểm
     </nav>
 </div>
 {% endblock %}
+
+{% block body %}
+<div class="modal fade" id="changePass" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Đổi mật khẩu</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row ml-2 mr-2">
+                    <input type="password" id="oldPass" class="form-control" placeholder="Mật khẩu củ">
+                </div>
+                <div class="form-group row ml-2 mr-2">
+                    <input type="password" id="newPass" class="form-control" placeholder="Mật khẩu mới">
+                </div>
+                <div class="form-group row ml-2 mr-2">
+                    <input type="password" id="rePass" class="form-control" placeholder="Xác nhận mật khẩu">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-success" id="confirm" href="#">Thay đổi</a>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block jsFooter %}
+<script>
+$('ul').append(`<a href="#" class="nav-link" data-toggle="modal" data-target="#changePass">
+                        Đổi mật khẩu
+                </a>`);
+$('#confirm').click(function(e){
+    e.preventDefault();
+    var op = $('#oldPass').val();
+    var p = $('#newPass').val();
+    var rp = $('#rePass').val();
+    if (p=='' || op==''){
+        alert('Vui lòng nhập đầy đủ thông tin');
+    } else if (p != rp){
+        alert('Xác nhận mật khẩu không khớp! Kiểm tra lại');
+    } else {
+    $.ajax({
+        url: '/changePassword',
+        data: {oldpass:op, newpass:p},
+        type: 'POST',
+        success: function(response){
+            var res = JSON.parse(response);
+            if (res==true){
+                alert('Đổi thành công');
+                $('#oldPass').val('');
+                $('#newPass').val('');
+                $('#rePass').val('');
+                $('#changePass').modal('hide');
+            } else {
+                alert('Mật khẩu không đúng')
+            }
+        }
+    })
+    }
+})
+</script>
+
+{% endblock %}

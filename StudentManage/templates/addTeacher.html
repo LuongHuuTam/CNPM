@@ -1,0 +1,71 @@
+{% extends "manageStudent.html" %}
+
+{% block title %}
+Thêm giáo viên
+{% endblock %}
+
+
+{% block body %}
+<h2 style="text-align:center; margin-top:3rem; font-family:cursive; color:darkred">Thêm tài khoản giáo viên</h2>
+
+<div class="mt-2 p-3 border border-info rounded container bg-light">
+    <div class="mt-2">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+        <p style="color:blue" class="text-center">{{ msg }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <form action="/manage/teacher/add" method="post">
+        <div class="form-group row">
+            <label for="staticUsername" class="col-sm-2 col-form-label text-right">Tên đăng nhập</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="staticUsername" name="username"
+                       value="{{acc.username}}">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticPassword" class="col-sm-2 col-form-label text-right">Mật khẩu</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="staticPassword" name="password">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticFirstName" class="col-sm-2 col-form-label text-right">Họ</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="staticFirstName" name="firstname"
+                       value="{{acc.firstname}}">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticLastName" class="col-sm-2 col-form-label text-right">Tên</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="staticLastName" name="lastname"
+                       value="{{acc.lastname}}">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="staticSubject" class="col-sm-2 col-form-label text-right">Môn học</label>
+            <div class="col-sm-10">
+                <select class="custom-select" name="subject" id="staticSubject">
+                    {% for s in sub %}
+                    <option value="{{s.id}}">{{s}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary m-2">Thêm</button>
+            <a href="/manage/teacher" class="btn btn-danger m-2">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block jsFooter %}
+<script>
+    $(".nav-item:nth-child({{ac}})").toggleClass('active');
+</script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, Date, Boolean, ForeignKey, Enum, or_
+from sqlalchemy import Column, Integer, Float, String, Date, Boolean, ForeignKey, Enum, func, distinct
 from sqlalchemy.orm import relationship
 from StudentManage import db
 from datetime import datetime
