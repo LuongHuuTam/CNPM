@@ -13,7 +13,7 @@ Thay đổi  qui định
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         {% for msg in messages %}
-        <p style="color:blue">{{ msg }}</p>
+        <p class="text-center text-danger" style="font-size:2rem">{{ msg }}</p>
         {% endfor %}
         {% endif %}
         {% endwith %}
@@ -29,7 +29,7 @@ Thay đổi  qui định
         <div class="form-group row">
             <label for="staticEmail" class="col-sm-2 col-form-label text-right">Giá trị</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="staticEmail" name="value" value="{{rule.value}}">
+                <input type="text" class="form-control" id="staticEmail" name="value" value="{{rule.value}}" required>
             </div>
         </div>
 
@@ -44,6 +44,7 @@ Thay đổi  qui định
 {% block jsFooter %}
 <script>
     $(".nav-item:nth-child({{ac}})").toggleClass('active');
+
 
 </script>
 {% endblock %}

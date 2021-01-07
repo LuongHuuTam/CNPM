@@ -130,29 +130,31 @@ def addstudent():
     if current_user.is_authenticated:
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
-            cl = get_all_class()
+            cl = get_class_to_add_student()
             if request.method == "GET":
                 return render_template('addStudent.html', ac=1, student=None, cl=cl)
             if request.method == "POST":
                 birthday = request.form.get("birthday")
                 age = Age(birthday)
+                minAge = get_min_age()
+                maxAge = get_max_age()
                 student = Student(
-                    firstname=request.form.get("firstname"),
-                    lastname=request.form.get("lastname"),
-                    fullname=request.form.get("firstname") + ' ' + request.form.get("lastname"),
+                    firstname=request.form.get("firstname").title(),
+                    lastname=request.form.get("lastname").title(),
+                    fullname=request.form.get("firstname").title() + ' ' + request.form.get("lastname").title(),
                     male=request.form.get("sex"),
                     birthday=birthday,
                     address=request.form.get("address"),
                     email=request.form.get("email"),
                     class_id=request.form.get("class")
                 )
-                if age >= 15 and age <= 20:
+                if age >= minAge and age <= maxAge:
                     db.session.add(student)
                     db.session.commit()
                     flash('Thêm thành công')
                     return render_template('addStudent.html', ac=1, student=None, cl=cl)
                 else:
-                    flash('Tuổi phải từ 15 đến 20')
+                    flash('Tuổi phải từ ' + str(minAge) + ' đến ' + str(maxAge))
                     return render_template('addStudent.html', ac=1, student=student, cl=cl)
         else:
             flash('Tài khoản của bạn không có quyền truy cập')
@@ -169,16 +171,18 @@ def editStudent(id):
         user = get_user_byID(current_user.get_id())
         if user.admin == 1:
             student = Student.query.get(id)
-            cl = get_all_class()
+            cl = get_class_to_add_student()
             if request.method == "GET":
                 return render_template('editStudent.html', ac=1, student=student, cl=cl)
             if request.method == "POST":
                 birthday = request.form.get("birthday")
                 age = Age(birthday)
-                if age >= 15 and age <= 20:
-                    student.firstname = request.form.get("firstname")
-                    student.lastname = request.form.get("lastname")
-                    student.fullname = request.form.get("firstname") + ' ' + request.form.get("lastname"),
+                minAge = get_min_age()
+                maxAge = get_max_age()
+                if age >= minAge and age <= maxAge:
+                    student.firstname = request.form.get("firstname").title()
+                    student.lastname = request.form.get("lastname").title()
+                    student.fullname = request.form.get("firstname").title() + ' ' + request.form.get("lastname").title(),
                     student.male = request.form.get("sex")
                     student.birthday = birthday
                     student.address = request.form.get("address")
@@ -188,7 +192,7 @@ def editStudent(id):
                     flash('Sửa thành công')
                     return redirect('/manage/student')
                 else:
-                    flash('Tuổi phải từ 15 đến 20')
+                    flash('Tuổi phải từ ' + str(minAge) + ' đến ' + str(maxAge))
                     return render_template('editStudent.html', ac=1, student=student, cl=cl)
         else:
             flash('Tài khoản của bạn không có quyền truy cập')
@@ -259,8 +263,8 @@ def addteacher():
                 acc = Account(
                     username=request.form.get('username'),
                     password=hashlib.md5(request.form.get('password').strip().encode("utf-8")).hexdigest(),
-                    firstname=request.form.get('firstname'),
-                    lastname=request.form.get('lastname'),
+                    firstname=request.form.get('firstname').title(),
+                    lastname=request.form.get('lastname').title(),
                     admin=0,
                     active=1,
                     subject_id=request.form.get('subject')
@@ -428,6 +432,7 @@ def editRule(id):
     else:
         return redirect('/login')
 
+
 @app.route('/changePassword', methods=['post'])
 def changePassword():
     user = get_user_byID(current_user.get_id())
@@ -438,7 +443,6 @@ def changePassword():
     user.password = hashlib.md5(password.strip().encode("utf-8")).hexdigest()
     db.session.commit()
     return jsonify('true')
-
 
 
 @app.route('/teacher')
@@ -572,4 +576,5 @@ if __name__ == '__main__':
     classes_append()
     from StudentManage.admin_module import *
 
+    get_class_to_add_student()
     app.run(debug=True, port=8888)

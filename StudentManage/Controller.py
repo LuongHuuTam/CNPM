@@ -42,6 +42,41 @@ class ReportSubject:
         self.rate = rate
 
 
+def get_min_age():
+    res = Rule.query.filter(Rule.name == 'MinAge').first()
+    return int(res.value)
+
+
+def get_max_age():
+    res = Rule.query.filter(Rule.name == 'MaxAge').first()
+    return int(res.value)
+
+
+def get_population():
+    res = Rule.query.filter(Rule.name == 'MaxPopulation').first()
+    return int(res.value)
+
+
+def check_class_id(id,list_class):
+    for i in list_class:
+        if i.id == id:
+            return True
+    return False
+
+
+
+def get_class_to_add_student():
+    max = get_population()
+    res = []
+    b = db.session.query(Class).join(Student).group_by(Class.id).having(func.count(Student.class_id) >= max).all()
+    temp = get_all_class()
+    for i in temp:
+        if check_class_id(i.id,b) == False:
+            res.append(i)
+
+    return res
+
+
 def get_user_byID(id):
     return Account.query.filter(Account.id == id).first()
 
@@ -268,8 +303,8 @@ def classes_append():
         c = Class.query.filter(Class.grade == i).order_by(Class.name).all()
         constraint = Rule.query.filter(Rule.name == 'Class' + i + 'Amount').first()
         if len(c) != constraint.value:
-            for x in range(1, constraint.value+1):
-                if check_class(str(x),c) == False:
+            for x in range(1, constraint.value + 1):
+                if check_class(str(x), c) == False:
                     temp = Class(
                         course=2020,
                         grade=i,

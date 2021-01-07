@@ -18,11 +18,16 @@ Home
 
 {% block body %}
 {% if res != None %}
-{% for i in res %}
-<div class="m-2">
-    <a href="/view-scores/{{i.id}}">{{i}}-{{i.class}}</a>
+<div class="card mt-2">
+    <ul class="list-group list-group-flush">
+        {% for i in res %}
+        <li class="list-group-item">
+            <a href="/view-scores/{{i.id}}">{{i}}-{{i.class}}</a>
+        </li>
+        {% endfor %}
+    </ul>
+
 </div>
-{% endfor %}
 {% endif %}
 {% endblock %}
 
@@ -31,6 +36,7 @@ Home
 {%if search != None %}
 $('input').val('{{search}}');
 {% endif %}
+
 
 </script>
 {% endblock %}
